@@ -1,0 +1,24 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: debian-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install build-essential cmake curl libmpfr-dev libmpc-dev libgmp-dev e2fsprogs ninja-build qemu-system-gui qemu-system-x86 qemu-utils ccache rsync unzip texinfo -y
+          sudo apt install gcc-11 g++-11 -y
+          sudo apt install libgtk-3-dev libpixman-1-dev libsdl2-dev libspice-server-dev -y
+          git clone https://github.com/SerenityOS/serenity.git
+          cd serenity && ./Meta/serenity.sh rebuild-toolchain
+          Meta/serenity.sh build
